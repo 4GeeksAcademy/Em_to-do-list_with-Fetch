@@ -1,27 +1,53 @@
 import React, { useEffect, useState } from "react";
 
 const Todolist = () => {
-
-  const [ userInput, setUserInput ] = useState('');
-  const [tasks, setTasks] = useState([''])
-
-  const [listImport, setListImport] = useState([])
   
-  function myFetch(){
-      fetch('https://playground.4geeks.com/apis/fake/todos/user/emdihoy')      
-      .then((rawData)=> rawData.json())
-      .then((data)=> setListImport(data))
-    }
+  const [userInput, setUserInput ] = useState('');
+  const [tasks, setTasks] = useState([''])
+  
+  const [listImport, setListImport] = useState([''])
 
-    useEffect(
-      ()=> {
-        myFetch()
-      },[]
-    )
-    
+    async function userGenerator() {
+      try {
+          let response = await fetch('https://playground.4geeks.com/apis/fake/todos/user/emidbh', {
+              method: 'POST',
+              headers: {
+                  "Content-Type": "application/json"
+              },
+              body: JSON.stringify([]),
+          });
+          let data = await response.json();
+          console.log(data);
+      } catch (error) {
+          console.log(error);
+        }
+      }   
+    async function putUpdate() {
+      try {
+      await fetch('https://playground.4geeks.com/apis/fake/todos/user/emidbh', {          
+          method: 'PUT',
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(listImport),
+      });
+  } catch (error) {
+      console.log(error);
+  }
+}
+    function fetchApiData() {
+      fetch('https://playground.4geeks.com/apis/fake/todos/user/emidbh')      
+        .then((rawData)=> rawData.json())
+        .then((data)=> setListImport(data))    
+    }    
     function validateInput () {
       if(userInput === "") alert("The input cannot be empty");  
     }
+    useEffect(
+    ()=> {
+      fetchApiData()
+        putUpdate()
+        userGenerator()
+      },[]
+    )
   
   return (            
       <div className="padre text-center">
@@ -38,20 +64,28 @@ const Todolist = () => {
                 setTasks(tasks.concat(userInput))
                 setUserInput('')
                 validateInput('')   
+                putUpdate('')
               }
             }}/>                 
           </li>
-          {listImport.map((item)=><li key={item.id}>{item.label}</li>) }
-          <div className="listItem">
+          {/* listImport es la lista de elementos en la API  */}
+            {listImport.map((item)=>
+              <li key={Math.random()}>{item.label}
+                <i className="float-end p-1 fas fa-trash-alt"
+                onClick={()=> setListImport(listImport.filter((t,currentIndex) => t != currentIndex)) } />
+              </li>
+            )}
+          
             {tasks.map((t, index) => (                  
               <li key={(Math.random())}>
               {t}
               <i className="float-end p-1 fas fa-trash-alt"
-                onClick={()=> setTasks(tasks.filter((t, currentIndex) => index != currentIndex)) } />
+                onClick={()=> setTasks(tasks.filter((t,currentIndex) => index != currentIndex)) } />
             </li>))}    
-          </div>
+    
+          {/* footerss */}
           <footer className="footer1">
-            <p>Total tasks: ({tasks.length})</p>                              
+            <p>Total tasks: ({tasks.length + listImport.length})</p>                              
           </footer>                                                                         
             <footer className="footer2">
           </footer>                                                                         
