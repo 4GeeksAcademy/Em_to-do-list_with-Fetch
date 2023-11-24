@@ -3,13 +3,13 @@ import React, { useEffect, useState } from "react";
 const Todolist = () => {
   
   const [userInput, setUserInput ] = useState('');
-  const [tasks, setTasks] = useState([''])
+  const [tasks, setTasks] = useState([])
   
   const [listImport, setListImport] = useState([''])
 
     async function userGenerator() {
       try {
-          let response = await fetch('https://playground.4geeks.com/apis/fake/todos/user/emidbh', {
+        let response = await fetch('https://playground.4geeks.com/apis/fake/todos/user/emdihoy', {
               method: 'POST',
               headers: {
                   "Content-Type": "application/json"
@@ -21,21 +21,18 @@ const Todolist = () => {
       } catch (error) {
           console.log(error);
         }
-      }   
-    async function putUpdate() {
-      try {
-      await fetch('https://playground.4geeks.com/apis/fake/todos/user/emidbh', {          
+      }         
+     
+    function putUpdate() {   
+         fetch ('https://playground.4geeks.com//apis/fake/todos/user/emdihoy', {          
           method: 'PUT',
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(listImport),
-      });
-  } catch (error) {
-      console.log(error);
-  }
-}
+        });
+    }
     function fetchApiData() {
-      fetch('https://playground.4geeks.com/apis/fake/todos/user/emidbh')      
-        .then((rawData)=> rawData.json())
+      fetch('https://playground.4geeks.com/apis/fake/todos/user/emdihoy')      
+        .then((response)=> response.json())
         .then((data)=> setListImport(data))    
     }    
     function validateInput () {
@@ -43,9 +40,9 @@ const Todolist = () => {
     }
     useEffect(
     ()=> {
-      fetchApiData()
-        putUpdate()
-        userGenerator()
+        putUpdate();
+        userGenerator();
+        fetchApiData();
       },[]
     )
   
@@ -65,6 +62,8 @@ const Todolist = () => {
                 setUserInput('')
                 validateInput('')   
                 putUpdate('')
+                console.log("esto es listimport: " + listImport)
+                console.log("esto es tasks: " + tasks)
               }
             }}/>                 
           </li>
