@@ -5,8 +5,6 @@ const Todolist = () => {
   const [userInput, setUserInput ] = useState('');
   const [tasks, setTasks] = useState([])
   
-  const [listImport, setListImport] = useState([''])
-
     async function userGenerator() {
       try {
         let response = await fetch('https://playground.4geeks.com/apis/fake/todos/user/emdihoy', {
@@ -23,28 +21,46 @@ const Todolist = () => {
         }
       }         
      
-    function putUpdate() {   
+     function putUpdate (tasksList) { 
+
+      let tareas = tasksList.map((item)=>{return{"label": String(item), "done":true}})
+      console.log("esto es tasks: " + tasks)  
          fetch ('https://playground.4geeks.com//apis/fake/todos/user/emdihoy', {          
           method: 'PUT',
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(listImport),
+          body: JSON.stringify(tareas),
+          redirect: 'follow'
         });
     }
     function fetchApiData() {
       fetch('https://playground.4geeks.com/apis/fake/todos/user/emdihoy')      
         .then((response)=> response.json())
-        .then((data)=> setListImport(data))    
+        .then((data)=> setTasks(data))    
     }    
     function validateInput () {
       if(userInput === "") alert("The input cannot be empty");  
     }
     useEffect(
     ()=> {
-        putUpdate();
         userGenerator();
         fetchApiData();
       },[]
     )
+    function deleteAllTasks() {
+      fetch('https://playground.4geeks.com/apis/fake/todos/user/emdihoy', {
+          method: 'DELETE',
+          headers: {
+              "Content-Type": "application/json"
+          },
+      })
+          .then(response => response.json())
+          .then(data => {
+              console.log(data);
+              setTasks([]);
+          })
+    }
+   
+
   
   return (            
       <div className="padre text-center">
@@ -59,38 +75,30 @@ const Todolist = () => {
             onKeyDown={(e)=> { 
               if (e.key === "Enter"){
                 setTasks(tasks.concat(userInput))
+                putUpdate(tasks.concat(userInput))
                 setUserInput('')
                 validateInput('')   
-                putUpdate('')
-                console.log("esto es listimport: " + listImport)
-                console.log("esto es tasks: " + tasks)
               }
             }}/>                 
           </li>
-          {/* listImport es la lista de elementos en la API  */}
-            {listImport.map((item)=>
-              <li key={Math.random()}>{item.label}
-                <i className="float-end p-1 fas fa-trash-alt"
-                onClick={()=> setListImport(listImport.filter((t,currentIndex) => t != currentIndex)) } />
-              </li>
-            )}
           
-            {tasks.map((t, index) => (                  
-              <li key={(Math.random())}>
-              {t}
+          {tasks.map((item, index) => (                  
+            <li key={(Math.random())}>
+             {item.label}
               <i className="float-end p-1 fas fa-trash-alt"
-                onClick={()=> setTasks(tasks.filter((t,currentIndex) => index != currentIndex)) } />
+                onClick={()=> setTasks(tasks.filter((item,currentIndex) => index != currentIndex)) } />
             </li>))}    
     
           {/* footerss */}
           <footer className="footer1">
-            <p>Total tasks: ({tasks.length + listImport.length})</p>                              
+            <p>Total tasks: ({tasks.length})</p>                              
           </footer>                                                                         
             <footer className="footer2">
           </footer>                                                                         
             <footer className="footer3">
           </footer>                                                                         
         </ul>
+        <button onClick={()=>deleteAllTasks()} type="button" className="btn btn-danger">Clear list</button>
       </div>
     </div>
   );
