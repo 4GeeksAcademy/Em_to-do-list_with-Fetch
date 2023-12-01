@@ -5,7 +5,7 @@ const Todolist = () => {
   const [userInput, setUserInput ] = useState('');
   const [tasks, setTasks] = useState([])
   
-    async function userGenerator() {
+    async function userGenerator(){
       try {
         let response = await fetch('https://playground.4geeks.com/apis/fake/todos/user/emdihoy', {
               method: 'POST',
@@ -21,48 +21,49 @@ const Todolist = () => {
         }
       }         
      
-     function putUpdate (tasksList) { 
-
-      let tareas = tasksList.map((item)=>{return{"label": String(item), "done":true}})
-      console.log("esto es tasks: " + tasks)  
+    function putUpdate (tasksList) { 
          fetch ('https://playground.4geeks.com//apis/fake/todos/user/emdihoy', {          
           method: 'PUT',
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(tareas),
+          body: JSON.stringify(tasksList),
           redirect: 'follow'
         });
-    }
+      }
     function fetchApiData() {
       fetch('https://playground.4geeks.com/apis/fake/todos/user/emdihoy')      
-        .then((response)=> response.json())
-        .then((data)=> setTasks(data))    
-    }    
+      .then((response)=> response.json())
+      .then((data)=> {setTasks(data)})
+      }    
     function validateInput () {
-      if(userInput === "") alert("The input cannot be empty");  
-    }
+        if(userInput === "") alert("The input cannot be empty");  
+      }
     useEffect(
-    ()=> {
-        userGenerator();
-        fetchApiData();
-      },[]
-    )
+        ()=> {
+          userGenerator();
+          fetchApiData();
+        },[]
+      )
     function deleteAllTasks() {
-      fetch('https://playground.4geeks.com/apis/fake/todos/user/emdihoy', {
-          method: 'DELETE',
+          fetch('https://playground.4geeks.com/apis/fake/todos/user/emdihoy', {
+            method: 'DELETE',
           headers: {
-              "Content-Type": "application/json"
+            "Content-Type": "application/json"
           },
-      })
-          .then(response => response.json())
+        })
+        .then(response => response.json())
           .then(data => {
-              console.log(data);
+            console.log(data);
               setTasks([]);
-          })
-    }
-   
-
-  
-  return (            
+              userGenerator()
+            })
+      }          
+    function deleteOne(index) {
+            const removeOne = tasks.filter((item, i) => index !== i);
+            putUpdate(removeOne);
+            setTasks(removeOne);
+      }
+                      
+          return (            
       <div className="padre text-center">
       <h1>todos</h1>    
         <div className="main-container">              
@@ -73,9 +74,9 @@ const Todolist = () => {
             onChange={(e) =>setUserInput(e.target.value)}
             value={userInput}
             onKeyDown={(e)=> { 
-              if (e.key === "Enter"){
-                setTasks(tasks.concat(userInput))
-                putUpdate(tasks.concat(userInput))
+              if (e.key === "Enter"){            
+                setTasks(tasks.concat({'label':userInput, 'done':false}))
+                putUpdate(tasks.concat({'label':userInput, 'done':false}))
                 setUserInput('')
                 validateInput('')   
               }
@@ -86,7 +87,7 @@ const Todolist = () => {
             <li key={(Math.random())}>
              {item.label}
               <i className="float-end p-1 fas fa-trash-alt"
-                onClick={()=> setTasks(tasks.filter((item,currentIndex) => index != currentIndex)) } />
+                onClick={()=>deleteOne(index)} />
             </li>))}    
     
           {/* footerss */}
